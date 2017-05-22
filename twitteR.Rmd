@@ -212,6 +212,9 @@ write.csv(combineTweets,file.path(dir,"Data","tweets_hastags_combined.csv"),row.
 With the help of [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html) we can reorganise and manipulate the dataset. For example, we can plot the number of tweets per day.
 
 ```{r fig.cap="Total number of tweets per day"}
+combineTweets <- read.csv(file.path(dir,"Data","tweets_hastags_combined.csv"))
+colnames(combineTweets)
+
 toDF_rupol_daily <- combineTweets %>% tidyr::separate(created, into = c("Day","Time"), sep = " ") %>%
 			dplyr::group_by(Day) %>% 
 			dplyr::summarise(tweetsPerDay = length(text)) %>%
@@ -283,6 +286,10 @@ Now that we have combined the tweets and the user's information we can start wit
 First, let's load the data where we saved the queen names and their twitter screen name:
 
 ```{r }
+# Read in data.frame containing tweets and User's infos
+combine_data <- read.csv(file.path(dir,"Data","Users_infos_and_tweets.csv"), stringsAsFactors = FALSE)
+table(combine_data$location)
+
 queens <- read.csv(file.path(dir,"Data","queens_name.csv"))
 knitr::kable(queens)
 ```
@@ -290,9 +297,6 @@ knitr::kable(queens)
 We are going to do the search through the *grep* function and for every queen we need a unique vector of names. This is because a queen can be mentioned via her twitter name, her queen name or even her real name. For simplicity and to avoi overlap between queens we will perform the search using their drag queen names and their twitter names. 
 
 ```{r}
-# Read in data.frame containing tweets and User's infos
-combine_data <- read.csv(file.path(dir,"Data","Users_infos_and_tweets.csv"), stringsAsFactors = FALSE)
-
 # Separate queen name into their components
 queens <- queens %>% 
   tidyr::separate(Queen.Name, into = c("Queen1","Queen2","Queen3"), sep = " ", remove = FALSE)
@@ -307,7 +311,9 @@ queen_vector <- function(x){
 # List containing the vectors for every queen
 queens_vecs <- apply(queens, 1,queen_vector)
 queens_grepKey_prepare <- lapply(queens_vecs, function(x) paste0(x, collapse = "|"))
+```
 
+```{r}
 # Set the encoding of the tweets as latin to avoid issues with for example emoji
 Encoding(combine_data$text) <- "latin1"
 grep_queens <- lapply(queens_grepKey_prepare, function(x) grep(x,combine_data$text))
