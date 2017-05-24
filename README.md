@@ -774,7 +774,7 @@ Participant competition winner!
 
 Below is the pot produced by the Twitter Workshop winner!!
 
-Plot produced by *Hannah Johns*
+Plot produced by *Hannah Johns*: Sentiment analysis of 2 weeks of Rupaul's dragrace tweets by Queen and by day
 
 ``` r
 > library(scales)

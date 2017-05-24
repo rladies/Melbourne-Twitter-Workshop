@@ -518,7 +518,7 @@ At this point, the participants of the workshop were asked to create their own a
 
 Below is the pot produced by the Twitter Workshop winner!!
 
-Plot produced by *Hannah Johns*
+Plot produced by *Hannah Johns*: Sentiment analysis of 2 weeks of Rupaul's dragrace tweets by Queen and by day
 
 ```{r fig.width=20, fig.height=12}
 library(scales)
@@ -535,7 +535,6 @@ ggplot(combine_sentiment,aes(x=Day,fill=score_breakdown))+
 ```
 
 Something suspicious suddenly happened to the popular @atlsexyslim during the 5th May episodes! You might need to watch it or analyse the tweets to find out what! We had hints from the the expert that it might be realted to the Kardashian..... 
-
 
 
 
