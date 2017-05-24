@@ -3,10 +3,10 @@ title: "R-Ladies Melbourne - Twitter Workshop"
 author: "Anna Quaglieri & Saskia Freytag"
 date: "15th May 2017"
 output:
-  html_document:
+  github_document:
     toc: yes
     toc_depth: 3
-  github_document:
+  html_document:
     toc: yes
     toc_depth: 3
 linkcolor: magenta
@@ -520,7 +520,7 @@ Below is the pot produced by the Twitter Workshop winner!!
 
 Plot produced by *Hannah Johns*
 
-```{r fig.width=20}
+```{r fig.width=20, fig.height=12}
 library(scales)
 ggplot(combine_sentiment,aes(x=Day,fill=score_breakdown))+
   geom_bar(color="black",position="fill")+
