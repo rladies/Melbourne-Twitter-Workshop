@@ -15,6 +15,8 @@ Anna Quaglieri & Saskia Freytag
         -   [How come @atlsexyxlim has such huge number of tweets?](#how-come-atlsexyxlim-has-such-huge-number-of-tweets)
         -   [What are the most common words used in @atlsexyslim tweets?](#what-are-the-most-common-words-used-in-atlsexyslim-tweets)
         -   [Sentiment analysis](#sentiment-analysis)
+-   [Now make your own analysis!](#now-make-your-own-analysis)
+    -   [Participant competition winner!](#participant-competition-winner)
 
 Set up a twitter API
 ====================
@@ -245,9 +247,19 @@ Now we would like to combine the two sets of tweets and remove overlapping tweet
 With the help of [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html) we can reorganise and manipulate the dataset. For example, we can plot the number of tweets per day.
 
 ``` r
+> combineTweets <- read.csv(file.path(dir, "Data", "tweets_hastags_combined.csv"))
+> colnames(combineTweets)
+```
+
+    ##  [1] "text"          "favorited"     "favoriteCount" "replyToSN"    
+    ##  [5] "created"       "truncated"     "replyToSID"    "id"           
+    ##  [9] "replyToUID"    "statusSource"  "screenName"    "retweetCount" 
+    ## [13] "isRetweet"     "retweeted"     "longitude"     "latitude"
+
+``` r
 > toDF_rupol_daily <- combineTweets %>% tidyr::separate(created, 
-+     into = c("Day", "Time"), sep = " ") %>% dplyr::group_by(Day) %>% 
-+     dplyr::summarise(tweetsPerDay = length(text)) %>% 
++     into = c("Day", "Time"), sep = " ", remove = FALSE) %>% 
++     dplyr::group_by(Day) %>% dplyr::summarise(tweetsPerDay = length(text)) %>% 
 +     ggplot(aes(x = Day, y = tweetsPerDay)) + geom_bar(stat = "identity", 
 +     fill = "#88398A") + theme_bw() + theme(axis.text.x = element_text(angle = 45, 
 +     hjust = 1)) + coord_flip()
@@ -338,6 +350,92 @@ Now that we have combined the tweets and the user's information we can start wit
 First, let's load the data where we saved the queen names and their twitter screen name:
 
 ``` r
+> # Read in data.frame containing tweets and User's
+> # infos
+> combine_data <- read.csv(file.path(dir, "Data", "Users_infos_and_tweets.csv"), 
++     stringsAsFactors = FALSE)
+> table(combine_data$location)
+```
+
+    ## 
+    ##                                                \u2728 
+    ##                         73                          2 
+    ##                       221B                atlanta, ga 
+    ##                          3                          1 
+    ##                Atlanta, GA              Baltimore, MD 
+    ##                          1                         31 
+    ##              Beaverton, OR                        BHM 
+    ##                          2                          1 
+    ##           Bogotá, Colombia                Cardiff, NJ 
+    ##                          4                          1 
+    ##              Ceará, Brasil                   Chicago  
+    ##                          7                          2 
+    ##        Colchester, England             Columbus, Ohio 
+    ##                          2                          5 
+    ##               Cordova, TN            Crawley, England 
+    ##                          2                          1 
+    ##                 Dallas, TX                         dc 
+    ##                          3                          2 
+    ##                     e8+n16    East Kilbride, Scotland 
+    ##                          1                          1 
+    ##                 Edmond, OK     Faenza, Emilia Romagna 
+    ##                          2                          9 
+    ##                   gay hell                     Gotham 
+    ##                          3                         14 
+    ##       Guadalupe, Zacatecas                       Hell 
+    ##                          3                          6 
+    ##                   Homeless             Honeymoon ãve. 
+    ##                          1                          3 
+    ##               Honolulu, HI  ig + snap = lukeistrouble 
+    ##                          3                         23 
+    ##      Ile-de-France, France                   illinois 
+    ##                          2                          2 
+    ##           Indianapolis, IN  kakaotalk/line @ luchyena 
+    ##                          6                          2 
+    ##                  LAX / JFK            Los Angeles, CA 
+    ##                          6                          5 
+    ##    Los Angeles, California        lost in corn fields 
+    ##                          8                          5 
+    ##                 Maine, USA              Maryland, USA 
+    ##                          2                          2 
+    ##                 McAllen TX            Mérida, Yucatán 
+    ##                          3                          6 
+    ##             MIddle Georgia      Monterrey, Nuevo León 
+    ##                          1                          2 
+    ##             Morgantown, WV                 NEW JERSEY 
+    ##                          2                          4 
+    ##               New York, NY               North Jersey 
+    ##                         24                         30 
+    ##                      Ohio                   ottawa ks 
+    ##                          1                          1 
+    ##       Paterson, New Jersey         payless shoe store 
+    ##                          2                          6 
+    ##               Pennsylvania           portland, oregon 
+    ##                          1                          2 
+    ##                Raleigh, NC               Richmond, VA 
+    ##                          1                          3 
+    ##             san marcos, tx Sitting in traffic on rt 1 
+    ##                          1                          2 
+    ##               Syracuse, NY             Tampa, Florida 
+    ##                          6                          2 
+    ##           Toronto, Ontario             Toronto/Boston 
+    ##                          2                         16 
+    ##  Transsexual, Transylvania                         UK 
+    ##                          1                          3 
+    ##              United States             ur dads office 
+    ##                          8                          2 
+    ##              Vancouver, BC         West Hollywood, CA 
+    ##                          3                          2 
+    ##   West Hollywood, CA 90069     West Midlands, England 
+    ##                         17                          2 
+    ##                   Westeros          with y(our) nigga 
+    ##                          2                          4 
+    ##           world of wonder  Wouldn't you like to know? 
+    ##                          7                          2 
+    ##                   Your mom 
+    ##                          3
+
+``` r
 > queens <- read.csv(file.path(dir, "Data", "queens_name.csv"))
 > knitr::kable(queens)
 ```
@@ -362,11 +460,6 @@ First, let's load the data where we saved the queen names and their twitter scre
 We are going to do the search through the *grep* function and for every queen we need a unique vector of names. This is because a queen can be mentioned via her twitter name, her queen name or even her real name. For simplicity and to avoi overlap between queens we will perform the search using their drag queen names and their twitter names.
 
 ``` r
-> # Read in data.frame containing tweets and User's
-> # infos
-> combine_data <- read.csv(file.path(dir, "Data", "Users_infos_and_tweets.csv"), 
-+     stringsAsFactors = FALSE)
-> 
 > # Separate queen name into their components
 > queens <- queens %>% tidyr::separate(Queen.Name, into = c("Queen1", 
 +     "Queen2", "Queen3"), sep = " ", remove = FALSE)
@@ -402,7 +495,9 @@ We are going to do the search through the *grep* function and for every queen we
 > queens_vecs <- apply(queens, 1, queen_vector)
 > queens_grepKey_prepare <- lapply(queens_vecs, function(x) paste0(x, 
 +     collapse = "|"))
-> 
+```
+
+``` r
 > # Set the encoding of the tweets as latin to avoid
 > # issues with for example emoji
 > Encoding(combine_data$text) <- "latin1"
@@ -447,7 +542,7 @@ Now we can plot the number of time a queen was mentioned in a tweet every day.
 > dailyMention
 ```
 
-![Total number of times that a queen was mentioned in a tweet.](twitteR_files/figure-markdown_github/unnamed-chunk-19-1.png)
+![Total number of times that a queen was mentioned in a tweet.](twitteR_files/figure-markdown_github/unnamed-chunk-20-1.png)
 
 ``` r
 > # ggplotly(dailyMention)
@@ -465,7 +560,7 @@ Now we can plot the number of time a queen was mentioned in a tweet every day.
 > dailyMention
 ```
 
-![Unique tweets per queen per day.](twitteR_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![Unique tweets per queen per day.](twitteR_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
 ``` r
 > # ggplotly(dailyMention)
@@ -489,7 +584,7 @@ The answer is in the retweets!
 > retweets
 ```
 
-![Number of retweets by number of unique tweets where a queen was mentioned per day.](twitteR_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![Number of retweets by number of unique tweets where a queen was mentioned per day.](twitteR_files/figure-markdown_github/unnamed-chunk-22-1.png)
 
 ``` r
 > # ggplotly(retweets)
@@ -562,7 +657,7 @@ Before plotting the wordcloud it is always useful to check and maybe remove the 
 +     max.words = 100, colors = brewer.pal(8, "Dark2"))
 ```
 
-![Wordcloud of the top 100 words for the tweets where @atlsexyxlim was mentioned.](twitteR_files/figure-markdown_github/unnamed-chunk-23-1.png)
+![Wordcloud of the top 100 words for the tweets where @atlsexyxlim was mentioned.](twitteR_files/figure-markdown_github/unnamed-chunk-24-1.png)
 
 ### Sentiment analysis
 
@@ -653,10 +748,44 @@ Now that the text is clean we can run the sentiment analysis with the `calculate
 +     geom_bar(stat = "count", position = "fill") + coord_flip()
 ```
 
-![](twitteR_files/figure-markdown_github/unnamed-chunk-26-1.png)
+![](twitteR_files/figure-markdown_github/unnamed-chunk-27-1.png)
+
+``` r
+> ggplot(combine_sentiment, aes(x = queen_name, fill = score_breakdown)) + 
++     geom_bar(stat = "count", position = "stack") + 
++     coord_flip()
+```
+
+![](twitteR_files/figure-markdown_github/unnamed-chunk-27-2.png)
 
 ``` r
 > # extract R code
 > knitr::purl(file.path(dir, "twitteR.Rmd"), output = file.path(dir, 
 +     "twitteR.R"), documentation = 2)
 ```
+
+Now make your own analysis!
+===========================
+
+At this point, the participants of the workshop were asked to create their own analysis (plot, table, plot and table, etc...) and a winner was nomintaed!
+
+Participant competition winner!
+-------------------------------
+
+Below is the pot produced by the Twitter Workshop winner!!
+
+Plot produced by *Hannah Johns*
+
+``` r
+> library(scales)
+> ggplot(combine_sentiment, aes(x = Day, fill = score_breakdown)) + 
++     geom_bar(color = "black", position = "fill") + 
++     facet_wrap(~queen_name, ncol = 7) + scale_y_continuous(labels = percent_format()) + 
++     theme_bw() + scale_fill_brewer(palette = "RdYlGn") + 
++     theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
++     theme(legend.position = "bottom")
+```
+
+![](twitteR_files/figure-markdown_github/unnamed-chunk-29-1.png)
+
+Something suspicious suddenly happened to the popular @atlsexyslim during the 5th May episodes! You might need to watch it or analyse the tweets to find out what! We had hints from the the expert that it might be realted to the Kardashian.....
