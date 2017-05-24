@@ -15,3 +15,4 @@ ggplot2
 plotly
 stringr
 knitr
+scales

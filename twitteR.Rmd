@@ -18,7 +18,7 @@ urlcolor: magenta
 knitr::opts_chunk$set(fig.width=8, fig.height=6, echo=T, warning=FALSE, message=FALSE,prompt=T,tidy=T,tidy.opts=list(width.cutoff=50),include=TRUE,cache=TRUE)
 
 # To be changed according to where the repository is saved
-dir <- "~/Documents/varie/Rladies/twitter_workshop"
+dir <- "~/Melbourne-Twitter-Workshop"
 
 library(png)
 library(grid)
@@ -215,7 +215,7 @@ With the help of [tidyr](https://cran.r-project.org/web/packages/tidyr/index.htm
 combineTweets <- read.csv(file.path(dir,"Data","tweets_hastags_combined.csv"))
 colnames(combineTweets)
 
-toDF_rupol_daily <- combineTweets %>% tidyr::separate(created, into = c("Day","Time"), sep = " ") %>%
+toDF_rupol_daily <- combineTweets %>% tidyr::separate(created, into = c("Day","Time"), sep = " ", remove = FALSE) %>%
 			dplyr::group_by(Day) %>% 
 			dplyr::summarise(tweetsPerDay = length(text)) %>%
 			ggplot(aes(x = Day, y = tweetsPerDay)) + 
@@ -498,6 +498,10 @@ combine_sentiment$score_breakdown <- cut(combine_sentiment$score, breaks = c(-In
 ggplot(combine_sentiment, aes(x = queen_name, fill = score_breakdown)) + 
 geom_bar(stat = "count", position = "fill") + coord_flip()
 
+ggplot(combine_sentiment, aes(x = queen_name, fill = score_breakdown)) + 
+geom_bar(stat = "count", position = "stack") + coord_flip()
+
+
 ```
 
 
@@ -505,6 +509,34 @@ geom_bar(stat = "count", position = "fill") + coord_flip()
 # extract R code
 knitr::purl(file.path(dir,"twitteR.Rmd"), output = file.path(dir,"twitteR.R"), documentation = 2)
 ```
+
+# Now make your own analysis!
+
+At this point, the participants of the workshop were asked to create their own analysis (plot, table, plot and table, etc...) and a winner was nomintaed!
+
+## Participant competition winner! 
+
+Below is the pot produced by the Twitter Workshop winner!!
+
+Plot produced by *Hannah Johns*
+
+```{r fig.width=20}
+library(scales)
+ggplot(combine_sentiment,aes(x=Day,fill=score_breakdown))+
+  geom_bar(color="black",position="fill")+
+  facet_wrap(~queen_name,ncol=7)+
+  scale_y_continuous(labels = percent_format())+
+  theme_bw()+
+  scale_fill_brewer(palette = "RdYlGn") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  theme(legend.position = "bottom")
+
+
+```
+
+Something suspicious suddenly happened to the popular @atlsexyslim during the 5th May episodes! You might need to watch it or analyse the tweets to find out what! We had hints from the the expert that it might be realted to the Kardashian..... 
+
+
 
 
 
